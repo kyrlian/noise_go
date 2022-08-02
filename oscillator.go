@@ -25,10 +25,11 @@ const (
 	FREQ int = iota
 	PHASE
 	AMPL
+	WIDTH
 )
 
 //Oscillator structure
-type OscillatorType struct {
+type Oscillator struct {
 	shape       int
 	freq        Signal
 	phase       Signal
@@ -38,18 +39,46 @@ type OscillatorType struct {
 }
 
 //CONSTRUCTORS
-func oscillator(shape int, freq Signal, phase Signal, ampl Signal, width Signal, customshape [](TimedPair)) OscillatorType {
-	return OscillatorType{shape, freq, phase, ampl, width, customshape}
+func oscillator_full(shape int, freq Signal, phase Signal, ampl Signal, width Signal, customshape [](TimedPair)) Oscillator {
+	return Oscillator{shape, freq, phase, ampl, width, customshape}
 }
-func oscillator_f(shape int, freq float64) OscillatorType {
-	return oscillator(shape, tf(freq), tf(.0), tf(1.0), tf(.0), nil)
+func oscillator(shape int, freq Signal, phase Signal, ampl Signal) Oscillator {
+	return oscillator_full(shape, freq, phase, ampl, tf(.5), nil)
 }
-func oscillator_fpa(shape int, freq float64, phase float64, ampl float64) OscillatorType {
-	return oscillator(shape, tf(freq), tf(phase), tf(ampl), tf(.0), nil)
+func oscillator_sf(shape int, freq float64) Oscillator {
+	return oscillator(shape, tf(freq), tf(.0), tf(1.0))
+}
+func oscillator_sfpa(shape int, freq float64, phase float64, ampl float64) Oscillator {
+	return oscillator(shape, tf(freq), tf(phase), tf(ampl))
+}
+
+//CONSTRUCTORS dedicated to shapes
+func oscillator_pulse(freq Signal, phase Signal, ampl Signal, width Signal) Oscillator {
+	return oscillator_full(PULSE, freq, phase, ampl, width, nil)
+}
+func oscillator_noise(ampl Signal) Oscillator {
+	return oscillator(NOISE, tf(1.0), tf(1.0), ampl)
+}
+
+// See customshape.go for CUSTOM constructors
+
+//SETTERS
+func (o Oscillator) set(elem int, s Signal) Oscillator {
+	switch elem {
+	case FREQ:
+		o.freq = s
+	case PHASE:
+		o.phase = s
+	case AMPL:
+		o.ampl = s
+	case WIDTH:
+		o.width = s
+	}
+	return o
 }
 
 //GETERS
-func (o OscillatorType) getval(t float64) float64 {
+func (o Oscillator) getval(t float64) float64 {
 	var f = o.freq.getval(t)
 	var p = 1.0 / f                                  //period
 	var tmod = math.Mod(t, p)                        //O-p

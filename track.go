@@ -15,11 +15,22 @@ type Track struct {
 	elements [](TrackElement) //slice
 }
 
-func (tr Track) append(signal Signal, start float64, end float64, ampl Signal) Track {
-	tr.elements = append(tr.elements, TrackElement{signal, start, end, ampl})
-	return tr
+//CONSTRUCTORS
+func trackElement(signal Signal, start float64, end float64, ampl Signal) TrackElement {
+	if( end < start) { end = start }
+	return  TrackElement{signal, start, end, ampl}
+}
+func track() Track {
+	return Track{}
 }
 
+//MODIFIERS
+func (trackpointer *Track) appendSignal(signal Signal, start float64, end float64, ampl Signal) *Track { //pass pointer to modify in place
+	trackpointer.elements = append(trackpointer.elements, trackElement(signal, start, end, ampl))
+	return trackpointer //return the pointer, the given track has been modified
+}
+
+//GETTERS
 func (tr Track) getval(t float64) float64 {
 	var r = 0.0
 	//fmt.Printf("tr.elements.len: %v\n", len(tr.elements))
@@ -32,6 +43,5 @@ func (tr Track) getval(t float64) float64 {
 			//fmt.Printf("tr.getval.t,r: %v , %v\n", t, r)
 		}
 	}
-
 	return r
 }
