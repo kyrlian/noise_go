@@ -47,7 +47,7 @@ func initSpeaker() {
 	fmt.Printf("Preparing speakers\n")
 	//integrate with audio lib
 	var sampleRate = beep.SampleRate(44100)
-	var buffSize = sampleRate.N(time.Second) //buffer for 1 second
+	var buffSize = 5 * sampleRate.N(time.Second) //buffer for 5 seconds
 	speaker.Init(sampleRate, buffSize)
 }
 
